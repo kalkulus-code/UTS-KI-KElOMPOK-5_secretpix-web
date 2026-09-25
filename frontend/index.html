@@ -1,0 +1,572 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="description"
+        content="SecretPix - Aplikasi web steganografi pada citra digital."
+    >
+
+    <title>SecretPix</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        secret: {
+                            50: "#f3f8f5",
+                            100: "#e2eee7",
+                            200: "#c8ded1",
+                            300: "#9fc2ad",
+                            500: "#4f8f6b",
+                            600: "#3d7958",
+                            700: "#2e6046",
+                            800: "#244b37"
+                        }
+                    }
+                }
+            }
+        };
+    </script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="min-h-screen bg-secret-50 text-gray-800">
+
+    <!-- HEADER -->
+    <header class="border-b border-secret-100 bg-white">
+        <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+
+            <a
+                href="#"
+                class="text-2xl font-bold tracking-tight text-secret-700"
+            >
+                Secret<span class="text-secret-500">Pix</span>
+            </a>
+
+            <span class="text-sm text-gray-500">
+                UTS Keamanan Informasi
+            </span>
+
+        </div>
+    </header>
+
+
+    <!-- MAIN -->
+    <main>
+
+        <!-- HERO -->
+        <section class="bg-white">
+            <div class="mx-auto max-w-6xl px-6 py-14">
+
+                <div class="max-w-2xl">
+                    <p class="mb-3 text-sm font-semibold uppercase tracking-wider text-secret-600">
+                        Steganografi Citra Digital
+                    </p>
+
+                    <h1 class="text-4xl font-bold leading-tight text-secret-800 md:text-5xl">
+                        Pesan rahasia di balik gambar.
+                    </h1>
+
+                    <p class="mt-4 text-base leading-7 text-gray-600 md:text-lg">
+                        SecretPix membantu menyisipkan pesan ke dalam citra
+                        digital dan mengekstraksinya kembali menggunakan
+                        stego-key.
+                    </p>
+
+                    <a
+                        href="#studio"
+                        class="mt-7 inline-block rounded-lg bg-secret-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-secret-700"
+                    >
+                        Mulai menggunakan SecretPix
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- STUDIO -->
+        <section id="studio" class="scroll-mt-10">
+            <div class="mx-auto max-w-6xl px-6 py-12">
+
+                <div class="mb-7">
+                    <h2 class="text-2xl font-bold text-secret-800">
+                        Studio
+                    </h2>
+
+                    <p class="mt-1 text-sm text-gray-500">
+                        Pilih proses yang ingin dilakukan.
+                    </p>
+                </div>
+
+
+                <div class="grid gap-6 lg:grid-cols-[1fr_300px]">
+
+                    <!-- WORKSPACE -->
+                    <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+
+                        <!-- TAB -->
+                        <div class="mb-7 grid grid-cols-2 rounded-lg bg-gray-100 p-1">
+
+                            <button
+                                id="embedTab"
+                                type="button"
+                                class="mode-btn rounded-md bg-secret-600 px-4 py-2.5 text-sm font-semibold text-white"
+                                aria-selected="true"
+                            >
+                                Sisipkan Pesan
+                            </button>
+
+                            <button
+                                id="extractTab"
+                                type="button"
+                                class="mode-btn rounded-md px-4 py-2.5 text-sm font-semibold text-gray-600 hover:text-secret-700"
+                                aria-selected="false"
+                            >
+                                Baca Pesan
+                            </button>
+
+                        </div>
+
+
+                        <!-- =========================
+                             EMBED
+                        ========================== -->
+
+                        <section id="embedSection">
+
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-gray-900">
+                                    Sisipkan Pesan
+                                </h3>
+
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Pilih gambar, masukkan pesan, lalu gunakan
+                                    stego-key untuk proses penyisipan.
+                                </p>
+                            </div>
+
+
+                            <!-- IMAGE -->
+                            <div class="mb-6">
+                                <div class="mb-2 flex items-center justify-between">
+                                    <label
+                                        for="coverImage"
+                                        class="text-sm font-semibold text-gray-800"
+                                    >
+                                        Cover Image
+                                    </label>
+
+                                    <span class="text-xs text-gray-400">
+                                        PNG / BMP
+                                    </span>
+                                </div>
+
+                                <label
+                                    for="coverImage"
+                                    class="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center transition hover:border-secret-400 hover:bg-secret-50"
+                                >
+                                    <input
+                                        id="coverImage"
+                                        type="file"
+                                        accept=".png,.bmp,image/png,image/bmp"
+                                        class="hidden"
+                                    >
+
+                                    <div id="coverUploadText">
+                                        <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-secret-100 text-lg text-secret-700">
+                                            ↑
+                                        </div>
+
+                                        <p class="text-sm font-semibold text-gray-700">
+                                            Pilih gambar
+                                        </p>
+
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            PNG atau BMP dengan kualitas asli
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        id="coverPreview"
+                                        class="mt-4 hidden"
+                                    >
+                                        <img
+                                            id="coverPreviewImage"
+                                            src=""
+                                            alt="Preview cover image"
+                                            class="mx-auto max-h-64 rounded-lg object-contain"
+                                        >
+                                    </div>
+                                </label>
+
+                                <p
+                                    id="coverFileName"
+                                    class="mt-2 text-xs text-gray-500"
+                                >
+                                    Belum ada file dipilih.
+                                </p>
+                            </div>
+
+
+                            <!-- MESSAGE -->
+                            <div class="mb-6">
+
+                                <div class="mb-2 flex items-center justify-between">
+                                    <label
+                                        for="message"
+                                        class="text-sm font-semibold text-gray-800"
+                                    >
+                                        Pesan Rahasia
+                                    </label>
+
+                                    <span
+                                        id="messageCounter"
+                                        class="text-xs text-gray-400"
+                                    >
+                                        0 karakter
+                                    </span>
+                                </div>
+
+                                <textarea
+                                    id="message"
+                                    rows="5"
+                                    placeholder="Tulis pesan yang ingin disembunyikan..."
+                                    class="w-full resize-y rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-secret-500 focus:ring-2 focus:ring-secret-100"
+                                ></textarea>
+
+                            </div>
+
+
+                            <!-- STEGO KEY -->
+                            <div class="mb-6">
+
+                                <label
+                                    for="stegoKey"
+                                    class="mb-2 block text-sm font-semibold text-gray-800"
+                                >
+                                    Stego Key
+                                </label>
+
+                                <input
+                                    id="stegoKey"
+                                    type="password"
+                                    placeholder="Masukkan stego-key"
+                                    autocomplete="new-password"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-secret-500 focus:ring-2 focus:ring-secret-100"
+                                >
+
+                                <p class="mt-2 text-xs text-gray-500">
+                                    Gunakan key yang sama saat melakukan ekstraksi.
+                                </p>
+
+                            </div>
+
+
+                            <button
+                                id="embedButton"
+                                type="button"
+                                class="w-full rounded-lg bg-secret-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-secret-700"
+                            >
+                                Sisipkan Pesan
+                            </button>
+
+                            <p
+                                id="embedStatus"
+                                class="mt-3 min-h-5 text-sm text-gray-500"
+                            ></p>
+
+                        </section>
+
+
+                        <!-- =========================
+                             EXTRACT
+                        ========================== -->
+
+                        <section
+                            id="extractSection"
+                            class="hidden"
+                        >
+
+                            <div class="mb-6">
+                                <h3 class="text-xl font-bold text-gray-900">
+                                    Baca Pesan
+                                </h3>
+
+                                <p class="mt-1 text-sm text-gray-500">
+                                    Masukkan stego image dan stego-key untuk
+                                    mengambil pesan tersembunyi.
+                                </p>
+                            </div>
+
+
+                            <!-- STEGO IMAGE -->
+                            <div class="mb-6">
+
+                                <div class="mb-2 flex items-center justify-between">
+                                    <label
+                                        for="stegoImage"
+                                        class="text-sm font-semibold text-gray-800"
+                                    >
+                                        Stego Image
+                                    </label>
+
+                                    <span class="text-xs text-gray-400">
+                                        PNG / BMP
+                                    </span>
+                                </div>
+
+
+                                <label
+                                    for="stegoImage"
+                                    class="block cursor-pointer rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 p-6 text-center transition hover:border-secret-400 hover:bg-secret-50"
+                                >
+                                    <input
+                                        id="stegoImage"
+                                        type="file"
+                                        accept=".png,.bmp,image/png,image/bmp"
+                                        class="hidden"
+                                    >
+
+                                    <div id="stegoUploadText">
+                                        <div class="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full bg-secret-100 text-lg text-secret-700">
+                                            ↑
+                                        </div>
+
+                                        <p class="text-sm font-semibold text-gray-700">
+                                            Pilih stego image
+                                        </p>
+
+                                        <p class="mt-1 text-xs text-gray-500">
+                                            PNG atau BMP dengan kualitas asli
+                                        </p>
+                                    </div>
+
+                                    <div
+                                        id="stegoPreview"
+                                        class="mt-4 hidden"
+                                    >
+                                        <img
+                                            id="stegoPreviewImage"
+                                            src=""
+                                            alt="Preview stego image"
+                                            class="mx-auto max-h-64 rounded-lg object-contain"
+                                        >
+                                    </div>
+                                </label>
+
+                                <p
+                                    id="stegoFileName"
+                                    class="mt-2 text-xs text-gray-500"
+                                >
+                                    Belum ada file dipilih.
+                                </p>
+
+                            </div>
+
+
+                            <!-- KEY -->
+                            <div class="mb-6">
+
+                                <label
+                                    for="extractKey"
+                                    class="mb-2 block text-sm font-semibold text-gray-800"
+                                >
+                                    Stego Key
+                                </label>
+
+                                <input
+                                    id="extractKey"
+                                    type="password"
+                                    placeholder="Masukkan stego-key"
+                                    autocomplete="current-password"
+                                    class="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm outline-none transition focus:border-secret-500 focus:ring-2 focus:ring-secret-100"
+                                >
+
+                            </div>
+
+
+                            <button
+                                id="extractButton"
+                                type="button"
+                                class="w-full rounded-lg bg-secret-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-secret-700"
+                            >
+                                Baca Pesan
+                            </button>
+
+                            <p
+                                id="extractStatus"
+                                class="mt-3 min-h-5 text-sm text-gray-500"
+                            ></p>
+
+
+                            <!-- RESULT -->
+                            <div class="mt-6">
+
+                                <div class="mb-2 flex items-center justify-between">
+                                    <label class="text-sm font-semibold text-gray-800">
+                                        Pesan yang ditemukan
+                                    </label>
+
+                                    <span class="text-xs font-medium text-secret-600">
+                                        SecretPix
+                                    </span>
+                                </div>
+
+                                <div
+                                    id="recoveredMessage"
+                                    class="min-h-28 rounded-lg border border-gray-200 bg-gray-50 p-4 text-sm leading-6 text-gray-500"
+                                >
+                                    Pesan hasil ekstraksi akan muncul di sini.
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                    </div>
+
+
+                    <!-- INFO -->
+                    <aside class="h-fit rounded-xl border border-secret-200 bg-secret-700 p-6 text-white">
+
+                        <h3 class="text-lg font-bold">
+                            Tentang SecretPix
+                        </h3>
+
+                        <p class="mt-3 text-sm leading-6 text-secret-100">
+                            SecretPix menggunakan citra digital sebagai media
+                            untuk menyimpan pesan rahasia.
+                        </p>
+
+                        <div class="mt-6 space-y-4 border-t border-white/10 pt-5">
+
+                            <div>
+                                <p class="text-xs text-secret-300">
+                                    Metode
+                                </p>
+                                <p class="mt-1 text-sm font-medium">
+                                    Least Significant Bit (LSB)
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs text-secret-300">
+                                    Format
+                                </p>
+                                <p class="mt-1 text-sm font-medium">
+                                    PNG dan BMP
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs text-secret-300">
+                                    Fitur
+                                </p>
+                                <p class="mt-1 text-sm font-medium">
+                                    Embed & Extract
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </aside>
+
+                </div>
+            </div>
+        </section>
+
+
+        <!-- CARA KERJA -->
+        <section
+            id="cara-kerja"
+            class="border-t border-secret-100 bg-white"
+        >
+            <div class="mx-auto max-w-6xl px-6 py-12">
+
+                <h2 class="text-2xl font-bold text-secret-800">
+                    Cara Kerja
+                </h2>
+
+                <div class="mt-6 grid gap-5 md:grid-cols-3">
+
+                    <div class="rounded-lg border border-gray-200 p-5">
+                        <span class="text-sm font-bold text-secret-600">
+                            01
+                        </span>
+
+                        <h3 class="mt-3 font-semibold">
+                            Pilih gambar
+                        </h3>
+
+                        <p class="mt-2 text-sm leading-6 text-gray-500">
+                            Gunakan gambar PNG atau BMP sebagai cover image.
+                        </p>
+                    </div>
+
+
+                    <div class="rounded-lg border border-gray-200 p-5">
+                        <span class="text-sm font-bold text-secret-600">
+                            02
+                        </span>
+
+                        <h3 class="mt-3 font-semibold">
+                            Masukkan pesan
+                        </h3>
+
+                        <p class="mt-2 text-sm leading-6 text-gray-500">
+                            Tulis pesan rahasia dan tentukan stego-key.
+                        </p>
+                    </div>
+
+
+                    <div class="rounded-lg border border-gray-200 p-5">
+                        <span class="text-sm font-bold text-secret-600">
+                            03
+                        </span>
+
+                        <h3 class="mt-3 font-semibold">
+                            Sisipkan atau baca
+                        </h3>
+
+                        <p class="mt-2 text-sm leading-6 text-gray-500">
+                            Lakukan proses embed atau extract sesuai kebutuhan.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+
+    <!-- FOOTER -->
+    <footer class="border-t border-secret-100 bg-secret-50">
+        <div class="mx-auto flex max-w-6xl flex-col gap-2 px-6 py-6 text-sm text-gray-500 sm:flex-row sm:items-center sm:justify-between">
+
+            <p>
+                Secret<span class="font-semibold text-secret-600">Pix</span>
+            </p>
+
+            <p>
+                Kelompok 5 — Keamanan Informasi
+            </p>
+
+        </div>
+    </footer>
+
+
+    <script src="js/script.js"></script>
+
+</body>
+</html>
