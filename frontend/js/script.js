@@ -1,3 +1,7 @@
+// ==============================
+// ELEMENT
+// ==============================
+
 const embedTab = document.getElementById("embedTab");
 const extractTab = document.getElementById("extractTab");
 
@@ -30,12 +34,27 @@ const recoveredMessage = document.getElementById("recoveredMessage");
 const stegoKey = document.getElementById("stegoKey");
 const extractKey = document.getElementById("extractKey");
 
+// Hasil steganografi
+const embedResult = document.getElementById("embedResult");
+
+const resultCoverImage = document.getElementById("resultCoverImage");
+const resultStegoImage = document.getElementById("resultStegoImage");
+
+const resultStegoPlaceholder =
+    document.getElementById("resultStegoPlaceholder");
+
+const resultStegoContainer =
+    document.getElementById("resultStegoContainer");
+
+const resultPsnr = document.getElementById("resultPsnr");
+const resultMse = document.getElementById("resultMse");
+
 
 // ==============================
-// TAB EMBED
+// TAB
 // ==============================
 
-embedTab.addEventListener("click", () => {
+function showEmbedTab() {
     embedSection.classList.remove("hidden");
     extractSection.classList.add("hidden");
 
@@ -47,14 +66,9 @@ embedTab.addEventListener("click", () => {
 
     embedTab.setAttribute("aria-selected", "true");
     extractTab.setAttribute("aria-selected", "false");
-});
+}
 
-
-// ==============================
-// TAB EXTRACT
-// ==============================
-
-extractTab.addEventListener("click", () => {
+function showExtractTab() {
     embedSection.classList.add("hidden");
     extractSection.classList.remove("hidden");
 
@@ -66,11 +80,14 @@ extractTab.addEventListener("click", () => {
 
     embedTab.setAttribute("aria-selected", "false");
     extractTab.setAttribute("aria-selected", "true");
-});
+}
+
+embedTab.addEventListener("click", showEmbedTab);
+extractTab.addEventListener("click", showExtractTab);
 
 
 // ==============================
-// VALIDASI EXTENSION
+// VALIDASI GAMBAR
 // ==============================
 
 function isSupportedImage(file) {
@@ -88,6 +105,25 @@ function isSupportedImage(file) {
 
 
 // ==============================
+// RESET HASIL EMBED
+// ==============================
+
+function resetEmbedResult() {
+    embedResult.classList.add("hidden");
+
+    resultCoverImage.src = "";
+
+    resultStegoImage.src = "";
+
+    resultPsnr.textContent = "-";
+    resultMse.textContent = "-";
+
+    resultStegoPlaceholder.classList.remove("hidden");
+    resultStegoContainer.classList.add("hidden");
+}
+
+
+// ==============================
 // COVER IMAGE
 // ==============================
 
@@ -96,16 +132,24 @@ coverImage.addEventListener("change", () => {
 
     if (!file) {
         coverFileName.textContent = "Belum ada file dipilih.";
+
         coverPreview.classList.add("hidden");
         coverPreviewImage.src = "";
+
+        resetEmbedResult();
         return;
     }
 
     if (!isSupportedImage(file)) {
-        coverFileName.textContent = "Format file tidak didukung.";
+        coverFileName.textContent =
+            "Format file tidak didukung. Gunakan PNG atau BMP.";
+
         coverPreview.classList.add("hidden");
         coverPreviewImage.src = "";
+
         coverImage.value = "";
+
+        resetEmbedResult();
         return;
     }
 
@@ -113,8 +157,23 @@ coverImage.addEventListener("change", () => {
 
     const imageUrl = URL.createObjectURL(file);
 
+    // Preview pada area upload
     coverPreviewImage.src = imageUrl;
     coverPreview.classList.remove("hidden");
+
+    // Preview pada area hasil
+    embedResult.classList.remove("hidden");
+    resultCoverImage.src = imageUrl;
+
+    // Stego belum tersedia karena backend belum terhubung
+    resultStegoPlaceholder.classList.remove("hidden");
+    resultStegoContainer.classList.add("hidden");
+
+    resultStegoImage.src = "";
+
+    // Reset nilai metrik
+    resultPsnr.textContent = "-";
+    resultMse.textContent = "-";
 
     coverPreviewImage.onload = () => {
         URL.revokeObjectURL(imageUrl);
@@ -131,16 +190,22 @@ stegoImage.addEventListener("change", () => {
 
     if (!file) {
         stegoFileName.textContent = "Belum ada file dipilih.";
+
         stegoPreview.classList.add("hidden");
         stegoPreviewImage.src = "";
+
         return;
     }
 
     if (!isSupportedImage(file)) {
-        stegoFileName.textContent = "Format file tidak didukung.";
+        stegoFileName.textContent =
+            "Format file tidak didukung. Gunakan PNG atau BMP.";
+
         stegoPreview.classList.add("hidden");
         stegoPreviewImage.src = "";
+
         stegoImage.value = "";
+
         return;
     }
 
@@ -162,7 +227,8 @@ stegoImage.addEventListener("change", () => {
 // ==============================
 
 message.addEventListener("input", () => {
-    messageCounter.textContent = `${message.value.length} karakter`;
+    messageCounter.textContent =
+        `${message.value.length} karakter`;
 });
 
 
@@ -171,39 +237,52 @@ message.addEventListener("input", () => {
 // ==============================
 
 embedButton.addEventListener("click", () => {
-
     embedStatus.className = "mt-3 min-h-5 text-sm";
 
     const image = coverImage.files[0];
     const text = message.value.trim();
     const key = stegoKey.value.trim();
 
+    // Belum pilih gambar
     if (!image) {
-        embedStatus.textContent = "Silakan pilih cover image.";
+        embedStatus.textContent =
+            "Silakan pilih cover image.";
+
         embedStatus.classList.add("text-red-600");
         return;
     }
 
+    // Format gambar
     if (!isSupportedImage(image)) {
-        embedStatus.textContent = "Gunakan gambar PNG atau BMP.";
+        embedStatus.textContent =
+            "Gunakan gambar PNG atau BMP.";
+
         embedStatus.classList.add("text-red-600");
         return;
     }
 
+    // Pesan kosong
     if (!text) {
-        embedStatus.textContent = "Pesan rahasia belum diisi.";
+        embedStatus.textContent =
+            "Pesan rahasia belum diisi.";
+
         embedStatus.classList.add("text-red-600");
         return;
     }
 
+    // Key kosong
     if (!key) {
-        embedStatus.textContent = "Stego-key belum diisi.";
+        embedStatus.textContent =
+            "Stego-key belum diisi.";
+
         embedStatus.classList.add("text-red-600");
         return;
     }
 
+    // Backend belum tersambung
     embedStatus.textContent =
         "Input valid. Proses embed akan dihubungkan ke backend.";
+
     embedStatus.classList.add("text-secret-600");
 });
 
@@ -213,34 +292,67 @@ embedButton.addEventListener("click", () => {
 // ==============================
 
 extractButton.addEventListener("click", () => {
-
     extractStatus.className = "mt-3 min-h-5 text-sm";
 
     const image = stegoImage.files[0];
     const key = extractKey.value.trim();
 
+    // Belum pilih gambar
     if (!image) {
-        extractStatus.textContent = "Silakan pilih stego image.";
+        extractStatus.textContent =
+            "Silakan pilih stego image.";
+
         extractStatus.classList.add("text-red-600");
         return;
     }
 
+    // Format gambar
     if (!isSupportedImage(image)) {
-        extractStatus.textContent = "Gunakan gambar PNG atau BMP.";
+        extractStatus.textContent =
+            "Gunakan gambar PNG atau BMP.";
+
         extractStatus.classList.add("text-red-600");
         return;
     }
 
+    // Key kosong
     if (!key) {
-        extractStatus.textContent = "Stego-key belum diisi.";
+        extractStatus.textContent =
+            "Stego-key belum diisi.";
+
         extractStatus.classList.add("text-red-600");
         return;
     }
 
+    // Backend belum tersambung
     extractStatus.textContent =
         "Input valid. Proses extract akan dihubungkan ke backend.";
+
     extractStatus.classList.add("text-secret-600");
 
     recoveredMessage.textContent =
         "Backend belum terhubung.";
 });
+
+
+// ==============================
+// FUNGSI UNTUK HASIL BACKEND
+// ==============================
+// Fungsi ini belum dipanggil sekarang.
+// Nanti akan digunakan saat T12,
+// ketika frontend sudah terhubung ke backend.
+
+function showEmbedResult(stegoImageUrl, psnr, mse) {
+    embedResult.classList.remove("hidden");
+
+    resultStegoPlaceholder.classList.add("hidden");
+    resultStegoContainer.classList.remove("hidden");
+
+    resultStegoImage.src = stegoImageUrl;
+
+    resultPsnr.textContent =
+        psnr !== undefined ? psnr : "-";
+
+    resultMse.textContent =
+        mse !== undefined ? mse : "-";
+}
