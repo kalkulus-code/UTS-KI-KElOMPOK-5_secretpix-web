@@ -2,6 +2,14 @@ from PIL import Image
 from backend.steganography.prng import get_shuffled_pixel_indices
 from backend.steganography.capacity import cek_kapasitas
 
+from backend.crypto.encryption import encrypt_message, decrypt_message
+
+def bytes_ke_biner(data_bytes):
+    return "".join(format(b, "08b") for b in data_bytes)
+
+def biner_ke_bytes(biner):
+    return bytes(int(biner[i:i+8], 2) for i in range(0, len(biner), 8))
+
 def teks_ke_biner(teks):
     return "".join(format(b, "08b") for b in teks.encode("utf-8"))
 
@@ -9,11 +17,22 @@ def biner_ke_teks(biner):
     byte_list = bytes(int(biner[i:i+8], 2) for i in range(0, len(biner), 8))
     return byte_list.decode("utf-8", errors="ignore")
 
-def sisipkan_lsb(lokasi_gambar, lokasi_output, pesan, stego_key):
+def sisipkan_lsb(lokasi_gambar, lokasi_output, pesan, stego_key, encrypt=True, crypto_algo="aes"):
     img = Image.open(lokasi_gambar).convert("RGB")
     
-    # 1. Siapkan header 32-bit + payload pesan
-    pesan_biner = teks_ke_biner(pesan)
+    # 1. Enkripsi pesan jika encrypt=True
+    if encrypt:
+        if isinstance(pesan, str):
+            payload_bytes = encrypt_message(pesan, stego_key, algorithm=crypto_algo)
+        else:
+            payload_bytes = pesan
+        pesan_biner = bytes_ke_biner(payload_bytes)
+    else:
+        if isinstance(pesan, bytes):
+            pesan_biner = bytes_ke_biner(pesan)
+        else:
+            pesan_biner = teks_ke_biner(pesan)
+
     data_total = format(len(pesan_biner), "032b") + pesan_biner
     jumlah_bit = len(data_total)
 
@@ -39,7 +58,7 @@ def sisipkan_lsb(lokasi_gambar, lokasi_output, pesan, stego_key):
     img.save(lokasi_output, format="PNG")
     print(f"Pesan berhasil disisipkan ke: {lokasi_output}")
 
-def ekstrak_lsb(lokasi_gambar, stego_key):
+def ekstrak_lsb(lokasi_gambar, stego_key, decrypt=True):
     img = Image.open(lokasi_gambar).convert("RGB")
     
     # Flatten seluruh channel warna
@@ -65,7 +84,16 @@ def ekstrak_lsb(lokasi_gambar, stego_key):
 
     # 2. Ambil bit pesan sebanyak panjang_pesan langsung dari indeks bit ke 32
     pesan_biner = "".join(get_bit(i) for i in range(32, 32 + panjang_pesan))
-    return biner_ke_teks(pesan_biner)
+    
+    # 3. Dekripsi payload jika decrypt=True
+    if decrypt:
+        payload_bytes = biner_ke_bytes(pesan_biner)
+        try:
+            return decrypt_message(payload_bytes, stego_key)
+        except Exception as e:
+            return f"Error saat dekripsi: {str(e)}"
+    else:
+        return biner_ke_teks(pesan_biner)
 
 if __name__ == "__main__":
     kunci = "rahasia123"
