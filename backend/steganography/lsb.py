@@ -1,145 +1,73 @@
 from PIL import Image
-
+from backend.steganography.prng import get_shuffled_pixel_indices
+from backend.steganography.capacity import cek_kapasitas
 
 def teks_ke_biner(teks):
-    """
-    Mengubah teks menjadi deretan bit biner.
-    Contoh:
-    'A' -> 01000001
-    """
-    data = teks.encode("utf-8")
-    return ''.join(format(byte, '08b') for byte in data)
+    return "".join(format(b, "08b") for b in teks.encode("utf-8"))
 
+def biner_ke_teks(biner):
+    byte_list = bytes(int(biner[i:i+8], 2) for i in range(0, len(biner), 8))
+    return byte_list.decode("utf-8", errors="ignore")
 
-def sisipkan_lsb(lokasi_gambar, lokasi_output, pesan):
-    """
-    Menyisipkan pesan teks ke dalam gambar menggunakan metode LSB.
+def sisipkan_lsb(lokasi_gambar, lokasi_output, pesan, stego_key):
+    img = Image.open(lokasi_gambar).convert("RGB")
+    
+    # 1. Siapkan header 32-bit + payload pesan
+    pesan_biner = teks_ke_biner(pesan)
+    data_total = format(len(pesan_biner), "032b") + pesan_biner
+    jumlah_bit = len(data_total)
 
-    Setiap channel RGB digunakan untuk menyimpan 1 bit pesan.
-    """
+    # 2. Flatten nilai RGB piksel menjadi 1 deretan list linier
+    channels = [val for px in img.getdata() for val in px]
+    total_pixels = len(channels) // 3
 
-    # ==========================================
-    # 1. Membuka gambar
-    # ==========================================
+    # Cek kapasitas
+    cek_kapasitas(len(pesan_biner), total_pixels)
 
-    gambar = Image.open(lokasi_gambar)
+    # 3. Dapatkan urutan piksel yang diacak berdasarkan stego-key
+    pixel_sequence = get_shuffled_pixel_indices(stego_key, total_pixels)
 
-    # Pastikan gambar menggunakan RGB
-    if gambar.mode != "RGB":
-        gambar = gambar.convert("RGB")
+    # 4. Sisipkan bit pesan ke LSB channel pada piksel yang diacak
+    for i in range(jumlah_bit):
+        px_idx = pixel_sequence[i // 3]  # Ambil piksel ke-berapa dari urutan acak
+        ch_idx = px_idx * 3 + (i % 3)    # Tentukan channel (R=0, G=1, B=2)
+        channels[ch_idx] = (channels[ch_idx] & ~1) | int(data_total[i])
 
-    pixel = gambar.load()
+    # 5. Reconstruct tuple RGB dan simpan gambar
+    new_pixels = [tuple(channels[i:i+3]) for i in range(0, len(channels), 3)]
+    img.putdata(new_pixels)
+    img.save(lokasi_output, format="PNG")
+    print(f"Pesan berhasil disisipkan ke: {lokasi_output}")
 
-    lebar, tinggi = gambar.size
+def ekstrak_lsb(lokasi_gambar, stego_key):
+    img = Image.open(lokasi_gambar).convert("RGB")
+    
+    # Flatten seluruh channel warna
+    channels = [val for px in img.getdata() for val in px]
+    total_pixels = len(channels) // 3
 
-    # ==========================================
-    # 2. Mengubah pesan menjadi biner
-    # ==========================================
+    # Dapatkan urutan piksel yang diacak (harus sama persis jika key sama)
+    pixel_sequence = get_shuffled_pixel_indices(stego_key, total_pixels)
 
-    data_biner = teks_ke_biner(pesan)
+    # Fungsi bantuan untuk membaca bit ke-i dari urutan acak
+    def get_bit(i):
+        px_idx = pixel_sequence[i // 3]
+        ch_idx = px_idx * 3 + (i % 3)
+        return str(channels[ch_idx] & 1)
 
-    jumlah_bit = len(data_biner)
+    # 1. Ambil 32 bit pertama untuk membaca header (panjang pesan)
+    header_biner = "".join(get_bit(i) for i in range(32))
+    panjang_pesan = int(header_biner, 2)
 
-    # ==========================================
-    # 3. Mengecek kapasitas gambar
-    # ==========================================
+    # Validasi header
+    if panjang_pesan == 0 or panjang_pesan > (len(channels) - 32):
+        return "Error: Tidak ada pesan rahasia yang valid atau password salah / gambar rusak."
 
-    kapasitas = lebar * tinggi * 3
-
-    if jumlah_bit > kapasitas:
-        raise ValueError(
-            "Pesan terlalu besar untuk gambar."
-        )
-
-    # ==========================================
-    # 4. Menyisipkan bit ke LSB pixel
-    # ==========================================
-
-    indeks_bit = 0
-
-    for y in range(tinggi):
-        for x in range(lebar):
-
-            # Ambil nilai RGB
-            merah, hijau, biru = pixel[x, y]
-
-            # ----------------------------------
-            # Channel Merah
-            # ----------------------------------
-
-            if indeks_bit < jumlah_bit:
-
-                bit = int(data_biner[indeks_bit])
-
-                # Ganti LSB merah
-                merah = (merah & ~1) | bit
-
-                indeks_bit += 1
-
-            # ----------------------------------
-            # Channel Hijau
-            # ----------------------------------
-
-            if indeks_bit < jumlah_bit:
-
-                bit = int(data_biner[indeks_bit])
-
-                # Ganti LSB hijau
-                hijau = (hijau & ~1) | bit
-
-                indeks_bit += 1
-
-            # ----------------------------------
-            # Channel Biru
-            # ----------------------------------
-
-            if indeks_bit < jumlah_bit:
-
-                bit = int(data_biner[indeks_bit])
-
-                # Ganti LSB biru
-                biru = (biru & ~1) | bit
-
-                indeks_bit += 1
-
-            # Simpan pixel yang sudah diubah
-            pixel[x, y] = (merah, hijau, biru)
-
-            # Jika semua bit pesan sudah dimasukkan
-            if indeks_bit >= jumlah_bit:
-                break
-
-        if indeks_bit >= jumlah_bit:
-            break
-
-    # ==========================================
-    # 5. Menyimpan gambar hasil steganografi
-    # ==========================================
-
-    gambar.save(lokasi_output, format="PNG")
-
-    print("Pesan berhasil disisipkan.")
-    print("Gambar hasil:", lokasi_output)
-
-
-# ==============================================
-# PROGRAM UTAMA
-# ==============================================
+    # 2. Ambil bit pesan sebanyak panjang_pesan langsung dari indeks bit ke 32
+    pesan_biner = "".join(get_bit(i) for i in range(32, 32 + panjang_pesan))
+    return biner_ke_teks(pesan_biner)
 
 if __name__ == "__main__":
-
-    # Nama file gambar asli
-    gambar_asli = "gambar_asli.png"
-
-    # Nama file hasil steganografi
-    gambar_stego = "gambar_stego.png"
-
-    # Pesan yang ingin disembunyikan
-    pesan = "Halo, ini pesan rahasia!"
-
-    # Menjalankan proses embedding
-    sisipkan_lsb(
-        gambar_asli,
-        gambar_stego,
-        pesan
-    )
+    kunci = "rahasia123"
+    sisipkan_lsb("gambar_asli.png", "gambar_stego.png", "Halo, ini pesan rahasia!", kunci)
+    print("Pesan ekstraksi:", ekstrak_lsb("gambar_stego.png", kunci))
