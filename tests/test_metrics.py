@@ -4,6 +4,8 @@ import numpy as np
 from PIL import Image
 from backend.metrics.mse import calculate_mse
 from backend.metrics.psnr import calculate_psnr, check_psnr_threshold
+from backend.metrics.histogram import generate_histogram_comparison
+from backend.metrics.enhanced_lsb import visualize_enhanced_lsb
 
 class TestMetricsMSE(unittest.TestCase):
     def setUp(self):
@@ -95,6 +97,42 @@ class TestMetricsPSNR(unittest.TestCase):
         
         if os.path.exists(noisy_path):
             os.remove(noisy_path)
+
+class TestMetricsVisual(unittest.TestCase):
+    def setUp(self):
+        self.img1_path = "dummy_visual_cover.png"
+        self.img2_path = "dummy_visual_stego.png"
+        self.hist_out = "dummy_hist_out.png"
+        self.lsb_out = "dummy_lsb_out.png"
+
+        # Image Cover
+        img1_arr = np.zeros((10, 10, 3), dtype=np.uint8)
+        img1_arr[:, :, :] = 128
+        Image.fromarray(img1_arr).save(self.img1_path)
+
+        # Image Stego (LSB dirubah)
+        img2_arr = np.copy(img1_arr)
+        img2_arr[0:5, 0:5, 0] = 129 # Modif bit
+        Image.fromarray(img2_arr).save(self.img2_path)
+
+    def tearDown(self):
+        for path in [self.img1_path, self.img2_path, self.hist_out, self.lsb_out]:
+            if os.path.exists(path):
+                os.remove(path)
+
+    def test_generate_histogram(self):
+        out_path = generate_histogram_comparison(self.img1_path, self.img2_path, self.hist_out)
+        self.assertTrue(os.path.exists(out_path))
+
+    def test_visualize_enhanced_lsb(self):
+        out_path = visualize_enhanced_lsb(self.img2_path, self.lsb_out, bit_plane=0)
+        self.assertTrue(os.path.exists(out_path))
+        
+        # Validasi bahwa ada piksel putih (255) yang dihasilkan dari LSB = 1
+        img_out = Image.open(out_path)
+        arr_out = np.array(img_out)
+        self.assertTrue(np.any(arr_out == 255))
+        self.assertTrue(np.any(arr_out == 0))
 
 if __name__ == "__main__":
     unittest.main()
