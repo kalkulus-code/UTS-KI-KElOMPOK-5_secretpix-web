@@ -125,6 +125,7 @@
                                 Sisipkan Pesan
                             </button>
 
+
                             <button
                                 id="extractTab"
                                 type="button"
@@ -279,6 +280,14 @@
                                 Sisipkan Pesan
                             </button>
 
+                            <p
+    id="embedStatus"
+    class="mt-3 min-h-5 text-sm"
+    role="status"
+    aria-live="polite"
+></p>
+
+                            
                             <!-- HASIL STEGANOGRAFI -->
 <div
     id="embedResult"
@@ -363,6 +372,14 @@
                     class="mx-auto max-h-64 max-w-full object-contain"
                 >
             </div>
+            <a
+    id="downloadStegoButton"
+    href="#"
+    download="stego_image.png"
+    class="mt-3 hidden w-full rounded-lg border border-secret-200 bg-secret-50 px-4 py-2.5 text-center text-sm font-semibold text-secret-700 transition hover:bg-secret-100"
+>
+    Download Stego Image
+</a>
         </div>
 
     </div>
