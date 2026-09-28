@@ -11,6 +11,9 @@
 
     <title>SecretPix</title>
 
+    <link rel="preconnect" href="https://api.fontshare.com">
+    <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@400,500,600,700&display=swap">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -51,9 +54,14 @@
                 Secret<span class="text-secret-500">Pix</span>
             </a>
 
-            <span class="text-sm text-gray-500">
-                UTS Keamanan Informasi
-            </span>
+            <nav class="site-nav" aria-label="Navigasi utama">
+                <a href="#studio">Workspace</a>
+                <a href="#cara-kerja">Cara Kerja</a>
+                <button id="themeToggle" class="theme-toggle" type="button" aria-pressed="false">
+                    Mode gelap
+                </button>
+                <span>UTS Keamanan Informasi</span>
+            </nav>
 
         </div>
     </header>
@@ -64,18 +72,18 @@
 
         <!-- HERO -->
         <section class="bg-white">
-            <div class="mx-auto max-w-6xl px-6 py-14">
+            <div class="hero-layout mx-auto max-w-6xl px-6 py-14">
 
-                <div class="max-w-2xl">
+                <div class="hero-copy max-w-3xl">
                     <p class="mb-3 text-sm font-semibold uppercase tracking-wider text-secret-600">
                         Steganografi Citra Digital
                     </p>
 
-                    <h1 class="text-4xl font-bold leading-tight text-secret-800 md:text-5xl">
-                        Pesan rahasia di balik gambar.
+                    <h1 class="hero-title text-4xl font-bold leading-tight text-secret-800 md:text-6xl">
+                        Pesan <span class="hero-inline-art" aria-hidden="true"></span>rahasia di balik gambar.
                     </h1>
 
-                    <p class="mt-4 text-base leading-7 text-gray-600 md:text-lg">
+                    <p id="heroDescription" class="mt-4 text-base leading-7 text-gray-600 md:text-lg">
                         SecretPix membantu menyisipkan pesan ke dalam citra
                         digital dan mengekstraksinya kembali menggunakan
                         stego-key.
@@ -87,6 +95,19 @@
                     >
                         Mulai menggunakan SecretPix
                     </a>
+
+                    <a href="#cara-kerja" class="hero-secondary-action">
+                        Lihat alur kerja
+                    </a>
+                </div>
+
+                <div class="hero-pixel-art" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
+                    <span></span><span></span><span></span><span></span><span></span><span></span>
                 </div>
 
             </div>
@@ -415,6 +436,22 @@
         </div>
 
     </div>
+
+    <nav
+        id="analysisTabs"
+        role="radiogroup"
+        aria-label="Analisis steganografi"
+        class="mt-5 flex flex-wrap gap-2 border-t border-gray-200 pt-5"
+    >
+        <input id="analysisHistogram" class="analysis-tab-input sr-only" type="radio" name="analysisPanel" value="histogram" checked>
+        <label for="analysisHistogram" class="analysis-tab">Histogram</label>
+
+        <input id="analysisJpeg" class="analysis-tab-input sr-only" type="radio" name="analysisPanel" value="jpeg">
+        <label for="analysisJpeg" class="analysis-tab">JPEG</label>
+
+        <input id="analysisEnhancedLsb" class="analysis-tab-input sr-only" type="radio" name="analysisPanel" value="enhanced-lsb">
+        <label for="analysisEnhancedLsb" class="analysis-tab">Enhanced LSB</label>
+    </nav>
 </div>
 
                         </section>
@@ -623,20 +660,28 @@
             id="cara-kerja"
             class="border-t border-secret-100 bg-white"
         >
-            <div class="mx-auto max-w-6xl px-6 py-12">
+            <div class="workflow-layout mx-auto max-w-6xl px-6 py-16">
 
-                <h2 class="text-2xl font-bold text-secret-800">
-                    Cara Kerja
-                </h2>
+                <div class="workflow-copy">
+                    <p class="mb-3 text-sm font-semibold uppercase tracking-[0.18em] text-secret-600">
+                        Alur kerja
+                    </p>
+                    <h2 class="workflow-title text-3xl font-bold text-secret-800 md:text-4xl" data-text="Cara Kerja">
+                        Cara Kerja
+                    </h2>
+                    <p class="mt-4 max-w-sm text-sm leading-6 text-gray-600">
+                        Tiga langkah sederhana untuk menyisipkan atau membaca pesan di dalam gambar.
+                    </p>
+                </div>
 
-                <div class="mt-6 grid gap-5 md:grid-cols-3">
+                <div id="workflowCards" class="workflow-cards grid gap-5 md:grid-cols-3">
 
                     <div class="rounded-lg border border-gray-200 p-5">
                         <span class="text-sm font-bold text-secret-600">
                             01
                         </span>
 
-                        <h3 class="mt-3 font-semibold">
+                        <h3 class="workflow-step-title mt-3 font-semibold" data-text="Pilih gambar">
                             Pilih gambar
                         </h3>
 
@@ -651,7 +696,7 @@
                             02
                         </span>
 
-                        <h3 class="mt-3 font-semibold">
+                        <h3 class="workflow-step-title mt-3 font-semibold" data-text="Masukkan pesan">
                             Masukkan pesan
                         </h3>
 
@@ -666,7 +711,7 @@
                             03
                         </span>
 
-                        <h3 class="mt-3 font-semibold">
+                        <h3 class="workflow-step-title mt-3 font-semibold" data-text="Sisipkan atau baca">
                             Sisipkan atau baca
                         </h3>
 
@@ -700,6 +745,137 @@
 
 
     <script src="js/script.js"></script>
+
+    <script>
+        (() => {
+            const themeToggle = document.getElementById("themeToggle");
+            const savedTheme = localStorage.getItem("secretpix-theme");
+
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-mode");
+            }
+
+            const updateThemeToggle = () => {
+                const isDark = document.body.classList.contains("dark-mode");
+                themeToggle.setAttribute("aria-pressed", String(isDark));
+                themeToggle.setAttribute(
+                    "aria-label",
+                    isDark ? "Aktifkan mode terang" : "Aktifkan mode gelap"
+                );
+                themeToggle.textContent = isDark ? "Terang" : "Gelap";
+            };
+
+            updateThemeToggle();
+
+            themeToggle.addEventListener("click", () => {
+                const isDark = document.body.classList.toggle("dark-mode");
+                localStorage.setItem("secretpix-theme", isDark ? "dark" : "light");
+                updateThemeToggle();
+            });
+        })();
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+    <script>
+        (() => {
+            if (!window.gsap || !window.ScrollTrigger) return;
+
+            const motionPreference = window.matchMedia(
+                "(prefers-reduced-motion: reduce)"
+            );
+
+            if (motionPreference.matches) return;
+
+            gsap.registerPlugin(ScrollTrigger);
+
+            const animatedImages = new WeakSet();
+            const embedResult = document.getElementById("embedResult");
+
+            const animateResultImages = () => {
+                document.querySelectorAll(
+                    "#resultCoverImage, #resultStegoImage, #jpegPreview, #enhancedLsbPreview"
+                ).forEach((image) => {
+                    if (!image.getAttribute("src") || animatedImages.has(image)) return;
+
+                    animatedImages.add(image);
+
+                    gsap.fromTo(
+                        image,
+                        { scale: 0.8, opacity: 0.2 },
+                        {
+                            scale: 1,
+                            opacity: 1,
+                            ease: "none",
+                            scrollTrigger: {
+                                trigger: image.parentElement,
+                                start: "top 90%",
+                                end: "top 35%",
+                                scrub: true
+                            }
+                        }
+                    );
+
+                    image.addEventListener(
+                        "load",
+                        () => ScrollTrigger.refresh(),
+                        { once: true }
+                    );
+                });
+            };
+
+            const resultObserver = new MutationObserver(() => {
+                animateResultImages();
+                ScrollTrigger.refresh();
+            });
+
+            resultObserver.observe(embedResult, {
+                attributes: true,
+                childList: true,
+                subtree: true,
+                attributeFilter: ["class", "src"]
+            });
+
+            animateResultImages();
+
+            gsap.from(".hero-copy > *", {
+                y: 24,
+                opacity: 0,
+                duration: 0.7,
+                stagger: 0.1,
+                ease: "power2.out"
+            });
+
+            gsap.fromTo(
+                ".hero-pixel-art",
+                { scale: 0.8, opacity: 0.7 },
+                {
+                    scale: 1,
+                    opacity: 1,
+                    duration: 0.9,
+                    ease: "power2.out",
+                    scrollTrigger: {
+                        trigger: ".hero-pixel-art",
+                        start: "top 85%",
+                        end: "bottom 15%",
+                        scrub: true
+                    }
+                }
+            );
+
+            gsap.from(".workflow-copy", {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                ease: "power2.out",
+                scrollTrigger: {
+                    trigger: "#cara-kerja",
+                    start: "top 80%",
+                    once: true
+                }
+            });
+        })();
+    </script>
 
 </body>
 </html>
