@@ -1,7 +1,7 @@
 import os
 import hashlib
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad, unpad
+from Crypto.Util.Padding import unpad
 from Crypto.Random import get_random_bytes
 
 
@@ -16,8 +16,8 @@ def encrypt_message(plaintext: str, key: str, algorithm: str = "aes") -> bytes:
     """
     Enkripsi plaintext menggunakan key.
     
-    Format output bytes untuk AES:
-      b"AES:" + salt (16 bytes) + iv (16 bytes) + ciphertext
+    Format output bytes untuk AES-GCM:
+      b"AES:GCM:" + salt (16 bytes) + nonce (12 bytes) + tag (16 bytes) + ciphertext
 
     Format output bytes untuk XOR:
       b"XOR:" + ciphertext
@@ -31,12 +31,11 @@ def encrypt_message(plaintext: str, key: str, algorithm: str = "aes") -> bytes:
 
     if algorithm.lower() == "aes":
         salt = get_random_bytes(16)
-        iv = get_random_bytes(16)
+        nonce = get_random_bytes(12)
         aes_key = _derive_key_aes(key, salt)
-        cipher = AES.new(aes_key, AES.MODE_CBC, iv)
-        padded_data = pad(plain_bytes, AES.block_size)
-        ciphertext = cipher.encrypt(padded_data)
-        return b"AES:" + salt + iv + ciphertext
+        cipher = AES.new(aes_key, AES.MODE_GCM, nonce=nonce)
+        ciphertext, tag = cipher.encrypt_and_digest(plain_bytes)
+        return b"AES:GCM:" + salt + nonce + tag + ciphertext
 
     elif algorithm.lower() == "xor":
         # XOR cipher dengan key-stream SHA-256 berulang
@@ -62,7 +61,28 @@ def decrypt_message(encrypted_data: bytes, key: str) -> str:
     if not key:
         raise ValueError("Kunci dekripsi tidak boleh kosong.")
 
-    if encrypted_data.startswith(b"AES:"):
+    if encrypted_data.startswith(b"AES:GCM:"):
+        payload = encrypted_data[len(b"AES:GCM:"):]
+        # 16 bytes salt + 12 bytes nonce + 16 bytes tag
+        if len(payload) < 44:
+            raise ValueError("Data terenkripsi rusak atau format AES-GCM tidak lengkap.")
+
+        salt = payload[:16]
+        nonce = payload[16:28]
+        tag = payload[28:44]
+        ciphertext = payload[44:]
+
+        aes_key = _derive_key_aes(key, salt)
+        cipher = AES.new(aes_key, AES.MODE_GCM, nonce=nonce)
+        try:
+            plaintext_bytes = cipher.decrypt_and_verify(ciphertext, tag)
+            return plaintext_bytes.decode("utf-8")
+        except Exception as exc:
+            raise ValueError("Dekripsi gagal: Kunci salah atau data korup.") from exc
+
+    elif encrypted_data.startswith(b"AES:"):
+        # Format AES-CBC lama tetap didukung agar stego image yang sudah dibuat
+        # sebelum migrasi ini masih dapat diekstraksi.
         payload = encrypted_data[4:]
         if len(payload) < 32:  # minimal 16 bytes salt + 16 bytes IV
             raise ValueError("Data terenkripsi rusak atau format AES tidak lengkap.")

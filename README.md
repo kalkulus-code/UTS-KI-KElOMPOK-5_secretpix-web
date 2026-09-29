@@ -74,10 +74,6 @@ UTS-KI-KELOMPOK-5_secretpix-web/
 ├── README.md
 └── .gitignore
 
-Cara Menjalankan
-Bagian ini akan dilengkapi setelah backend dan frontend selesai
-diimplementasikan.
-
 Persyaratan
 - Python 3
 - Web browser
@@ -89,12 +85,20 @@ git clone https://github.com/kalkulus-code/UTS-KI-KElOMPOK-5_secretpix-web.git
 Masuk ke folder project:
 cd UTS-KI-KELOMPOK-5_secretpix-web
 
-Instal dependency:
-pip install -r backend/requirements.txt
+Instal dependency dari folder utama project:
+```bash
+python -m pip install -r backend/requirements.txt
+```
 
-Menjalankan Aplikasi
-Perintah menjalankan aplikasi akan ditambahkan setelah struktur
-backend Flask selesai.
+Menjalankan aplikasi:
+```bash
+python backend/app.py
+```
+
+Buka `http://127.0.0.1:5000/` di browser. Buka halaman melalui alamat
+Flask tersebut agar request frontend ke `/api/embed` dan `/api/extract`
+terhubung ke backend. Jangan membuka `frontend/index.html` langsung atau
+menjalankannya lewat Live Server tanpa mengatur proxy API.
 
 Cara Penggunaan
 Embed Message

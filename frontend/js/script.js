@@ -177,7 +177,8 @@ function isSupportedImage(file) {
 
     const allowedTypes = [
         "image/png",
-        "image/bmp"
+        "image/bmp",
+        "image/x-ms-bmp"
     ];
 
     return allowedTypes.includes(file.type);
