@@ -821,9 +821,9 @@ embedButton.addEventListener(
             );
 
             resultPsnr.textContent =
-                result.psnr !== undefined
-                    ? result.psnr
-                    : "-";
+    result.psnr !== undefined
+        ? `${Number(result.psnr).toFixed(3)} dB`
+        : "-";
 
             resultMse.textContent =
                 result.mse !== undefined
