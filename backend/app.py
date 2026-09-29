@@ -14,8 +14,7 @@ from PIL import Image
 ROOT_DIR = Path(__file__).resolve().parent.parent
 BACKEND_DIR = ROOT_DIR / "backend"
 FRONTEND_DIR = ROOT_DIR / "frontend"
-OUTPUT_DIR = BACKEND_DIR / "outputs"
-
+OUTPUT_DIR = Path("/tmp/secretpix_outputs")
 OUTPUT_DIR.mkdir(
     parents=True,
     exist_ok=True
