@@ -2,6 +2,9 @@
 venv/
 .venv/
 
+# Node dependencies
+node_modules/
+
 # Python cache
 __pycache__/
 *.pyc
@@ -13,6 +16,12 @@ __pycache__/
 # VS Code
 .vscode/
 
+#  local tooling
+skills-lock.json
+
 # OS files
 .DS_Store
 Thumbs.db
+
+# Generated stego images
+backend/outputs/
