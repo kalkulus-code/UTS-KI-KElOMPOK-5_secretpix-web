@@ -16,9 +16,7 @@ __pycache__/
 # VS Code
 .vscode/
 
-# AI / local tooling
-.agents/
-.claude/
+#  local tooling
 skills-lock.json
 
 # OS files
